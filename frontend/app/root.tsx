@@ -23,6 +23,8 @@ export const links: Route.LinksFunction = () => [
   },
 ];
 
+import NavBar from "./components/navbar";
+
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
@@ -33,6 +35,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
+        <NavBar />
         {children}
         <ScrollRestoration />
         <Scripts />
