@@ -1,7 +1,7 @@
 require('dotenv').config();
-const axios = require('axios')
+import axios from 'axios';
 import { FastifyInstance, FastifyRequest } from "fastify";
-
+import { insertData, queryUser } from '../../database';
 interface DiscordCallbackQuery {
 	code?: string;
 }
@@ -30,7 +30,7 @@ export default async function discord(app: FastifyInstance) {
 					'Accept-Encoding': 'application/x-www-form-urlencoded'
 				}
 			}
-		); //store info in database (bearer token, refresh token)
+		);
 		
 		if (!response.data) throw new Error("No data in Discord Oauth2 response")
 
@@ -41,8 +41,26 @@ export default async function discord(app: FastifyInstance) {
 					Authorization: `Bearer ${response.data.access_token}`
 				}
 			}
-		); //create user with username and avatar
+		);
 		console.log(getUserInfo.data)
-		res.redirect('https://www.google.com');
+		queryUser('username', getUserInfo.data.username, (err, row) => { //Query database to check if user already exists
+			if (err) {
+				console.error(`Error in discord.ts: ${err.message}`);
+				res.status(500).send('Database error');
+				return;
+			}
+			if (!row) {
+				insertData( //Create new user
+					getUserInfo.data.global_name,
+					"",
+					getUserInfo.data.username,
+					""
+				)
+			}
+			else {
+				console.log(row);
+			}
+		})
+		res.redirect('http://www.localhost:5173');
 	})
 }

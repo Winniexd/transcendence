@@ -20,9 +20,12 @@
   },
   "homepage": "https://github.com/Winniexd/transcendence#readme",
   "dependencies": {
+    "@fastify/jwt": "^9.1.0",
     "axios": "^1.11.0",
     "dotenv": "^17.2.1",
-    "fastify": "^5.4.0"
+    "fastify": "^5.4.0",
+    "sqlite3": "^5.1.7",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@types/node": "^24.1.0",
