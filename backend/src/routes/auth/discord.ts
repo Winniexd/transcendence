@@ -11,7 +11,7 @@ export default async function discord(app: FastifyInstance) {
 		res.redirect('https://discord.com/oauth2/authorize?client_id=1398989102468042923&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fapi%2Fauth%2Fdiscord%2Fredirect&scope=identify')
 	})
 
-	app.get('/api/auth/discord/redirect', async (req: FastifyRequest<{ Querystring: DiscordCallbackQuery}>, res) => {
+	app.get('/api/auth/discord/redirect', async (req: FastifyRequest<{ Querystring: DiscordCallbackQuery }>, res) => {
 		const { code } = req.query;
 		if (!code) throw new Error("No code provided in discord Oauth2 request.");
 		const formData = new URLSearchParams({
@@ -43,24 +43,15 @@ export default async function discord(app: FastifyInstance) {
 			}
 		);
 		console.log(getUserInfo.data)
-		queryUser('username', getUserInfo.data.username, (err, row) => { //Query database to check if user already exists
-			if (err) {
-				console.error(`Error in discord.ts: ${err.message}`);
-				res.status(500).send('Database error');
-				return;
-			}
-			if (!row) {
-				insertData( //Create new user
-					getUserInfo.data.global_name,
-					"",
-					getUserInfo.data.username,
-					""
-				)
-			}
-			else {
-				console.log(row);
-			}
-		})
+		let user = await queryUser('username', getUserInfo.data.username);
+		if (!user) {
+			user = await insertData(
+				getUserInfo.data.global_name,
+				'',
+				getUserInfo.data.username,
+				''
+			)
+		}
 		res.redirect('http://www.localhost:5173');
 	})
 }

@@ -15,6 +15,8 @@ export default function createApp(opts = {}) {
       signed: false
     }
   });
+  app.addHook("onRequest", (req) => req.jwtVerify())
+
   initializeDatabase();
 
   return app;
