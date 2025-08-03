@@ -11,6 +11,7 @@ export const db = new sqlite3.Database('./transcendance.db', sqlite3.OPEN_READWR
 export function initializeDatabase() {
   let sql = `CREATE TABLE IF NOT EXISTS users(
   			id INTEGER PRIMARY KEY,
+			discord_id TEXT,
 			uuid TEXT UNIQUE,
 			first_name TEXT,
 			last_name TEXT,
@@ -19,11 +20,11 @@ export function initializeDatabase() {
   db.run(sql);
 }
 
-export function insertData(first_name: string, last_name:string, username:string, password:string): Promise<any> {
+export function insertData(discordUserId: string, first_name: string, last_name:string, username:string, password:string): Promise<any> {
 	const uuid = v4();
-	let sql = `INSERT INTO users(first_name, last_name, username, password) VALUES (?, ?, ?, ?, ?)`;
+	let sql = `INSERT INTO users(discord_id, uuid, first_name, last_name, username, password) VALUES (?, ?, ?, ?, ?, ?)`;
 	return new Promise((res, rej) => {
-		db.run(sql, [uuid, first_name, last_name, username, password], (err: Error | null) => {
+		db.run(sql, [discordUserId, uuid, first_name, last_name, username, password], (err: Error | null) => {
 			if (err) rej(err);
 			else res({ uuid })
 		});

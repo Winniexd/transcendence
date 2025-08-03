@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/Winniexd/transcendence#readme",
   "dependencies": {
+    "@fastify/cookie": "^11.0.2",
     "@fastify/jwt": "^9.1.0",
     "axios": "^1.11.0",
     "dotenv": "^17.2.1",

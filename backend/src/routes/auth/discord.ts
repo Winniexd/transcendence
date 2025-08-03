@@ -31,7 +31,6 @@ export default async function discord(app: FastifyInstance) {
 				}
 			}
 		);
-		
 		if (!response.data) throw new Error("No data in Discord Oauth2 response")
 
 		const getUserInfo = await axios.get(
@@ -42,16 +41,19 @@ export default async function discord(app: FastifyInstance) {
 				}
 			}
 		);
-		console.log(getUserInfo.data)
+		const { id, username, avatar } = getUserInfo.data;
 		let user = await queryUser('username', getUserInfo.data.username);
 		if (!user) {
 			user = await insertData(
-				getUserInfo.data.global_name,
+				id,
 				'',
-				getUserInfo.data.username,
+				'',
+				username,
 				''
 			)
 		}
-		res.redirect('http://www.localhost:5173');
+		console.log(username)
+		const token = app.jwt.sign({ uuid: user.uuid, username: user.username });
+		res.send(token)
 	})
 }
