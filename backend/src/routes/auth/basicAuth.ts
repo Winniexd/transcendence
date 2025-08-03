@@ -16,9 +16,10 @@ export default function basicAuth(app: FastifyInstance) {
 	app.post('/register', async (req: FastifyRequest<{ Body: RegisterBody }>, res) => {
 		const { username, password } = req.body;
 		let user = await queryUser('username', username);
-		if (!user) {
-			user = await insertData('', '', '', username, password);
+		if (user) {
+			return res.status(401).send({ error: "User already exists" })
 		}
+		user = await insertData('', '', '', username, password);
 		const token = app.jwt.sign({username, password});
 		res.send(token);
 	})
