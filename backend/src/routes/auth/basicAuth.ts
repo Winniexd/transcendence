@@ -1,8 +1,8 @@
 import { FastifyInstance, FastifyRequest } from "fastify";
 import { queryUser, insertData } from "../../database";
-import { error } from "console";
-
 interface RegisterBody {
+	first_name: string,
+	last_name: string,
 	username: string,
 	password: string
 }
@@ -14,14 +14,15 @@ interface LoginBody {
 
 export default function basicAuth(app: FastifyInstance) {
 	app.post('/register', async (req: FastifyRequest<{ Body: RegisterBody }>, res) => {
-		const { username, password } = req.body;
+		const { username, password, first_name, last_name } = req.body;
 		let user = await queryUser('username', username);
 		if (user) {
 			return res.status(401).send({ error: "User already exists" })
 		}
-		user = await insertData('', '', '', username, password);
-		const token = app.jwt.sign({username, password});
-		res.send(token);
+		user = await insertData('', first_name, last_name, username, password);
+		const token = app.jwt.sign({ uuid: user.uuid });
+		res.setCookie('token', token, { httpOnly: true });
+		res.send({ success: true });
 	})
 
 	app.post('/login', async (req: FastifyRequest<{ Body: LoginBody }>, res) => {
@@ -33,7 +34,13 @@ export default function basicAuth(app: FastifyInstance) {
 		if (user.password !== password) {
 			return res.status(401).send({ error: "Incorrect password" });
 		}
-		const token = app.jwt.sign({ uuid: user.uuid })
-		res.send(token);
+		const token = app.jwt.sign({ uuid: user.uuid });
+		res.setCookie('token', token, { httpOnly: true });
+		res.send({ success: true });
+	})
+
+	app.post('/logout', async (req, res) => {
+		res.clearCookie('token');
+		res.status(200).send('Logged out');
 	})
 }
