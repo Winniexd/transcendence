@@ -2,6 +2,8 @@ require('dotenv').config();
 import axios from 'axios';
 import { FastifyInstance, FastifyRequest } from "fastify";
 import { insertData, queryUser } from '../../database';
+import path from 'path'
+import fs from 'fs'
 interface DiscordCallbackQuery {
 	code?: string;
 }
@@ -42,7 +44,7 @@ export default async function discord(app: FastifyInstance) {
 			}
 		);
 		const { id, username, avatar } = getUserInfo.data;
-		let user = await queryUser('username', getUserInfo.data.username);
+		let user = await queryUser('discord_id', getUserInfo.data.id);
 		if (!user) {
 			user = await insertData(
 				id,
@@ -51,9 +53,19 @@ export default async function discord(app: FastifyInstance) {
 				username,
 				''
 			)
+			const res = await fetch(`https://cdn.discordapp.com/avatars/${id}/${avatar}.png`);
+			if (res.ok) {
+				try {
+					const arrayBuffer = await res.arrayBuffer();
+					const buffer = Buffer.from(arrayBuffer);
+					const avatarFilePath = path.join(__dirname, '..', '..', 'avatars', `${user.uuid}.png`);
+					fs.writeFileSync(avatarFilePath, buffer);
+				}
+				catch (err) { console.log(err);}
+			}
 		}
-		console.log(username)
-		const token = app.jwt.sign({ uuid: user.uuid, username: user.username });
-		res.send(token)
+		const token = app.jwt.sign({ uuid: user.uuid });
+		res.setCookie('token', token, { httpOnly: true, path: '/' });
+		res.redirect("http://localhost:5173");
 	})
 }

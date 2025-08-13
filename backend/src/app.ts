@@ -2,12 +2,14 @@ require('dotenv').config()
 import fastify from 'fastify'
 import discord from './routes/auth/discord'
 import basicAuth from './routes/auth/basicAuth';
-import routes from './routes/routes';
+import routes from './routes/userRoutes';
 import { initializeDatabase } from './database';
 import authenticate from './plugins/authenticate';
 import cookie from './plugins/cookie';
 import cors from './plugins/cors';
 import jwt from './plugins/jwt';
+import fs from 'fs'
+import path from 'path'
 
 export default function createApp(opts = {}) {
   const app = fastify(opts);
@@ -24,6 +26,9 @@ export default function createApp(opts = {}) {
   app.register(routes);
 
   initializeDatabase();
+  const dir = path.join(__dirname, 'avatars');
+  if (!fs.existsSync(dir))
+    fs.mkdirSync(dir);
 
   return app;
 }
