@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router";
 
 export default function NavBar() {
 	const [loggedIn, setLoggedIn] = useState(false);
@@ -44,15 +45,17 @@ export default function NavBar() {
 		menu?.classList.toggle("hidden");
 	}
 
+	const navigate = useNavigate();
+
 	return (
 		<nav className="bg-white border-gray-200 dark:bg-gray-900 dark:border-gray-700 p-4">
 			<div className="mx-5 flex items-center justify-between">
-				<a href="/" className="inline-flex gap-2">
+				<button onClick={() => navigate("/")} className="inline-flex gap-2 hover:cursor-pointer">
 					<img src="https://upload.wikimedia.org/wikipedia/commons/a/a7/React-icon.svg" alt="Logo" className="h-7"></img>
 					<p className="text-2xl font-semibold text-gray-900 dark:text-white">Transcendance</p>
-				</a>
+				</button>
 				<div className="flex items-center gap-6 text-gray-700 dark:text-gray-300">
-					<a href="#" className="hover:text-sky-500">Play</a>
+					<button onClick={() => navigate("/play")} className="hover:text-sky-500 hover:cursor-pointer">Play</button>
 					{loggedIn ? (
 						<div className="relative inline-block text-left leading-0">
 							<button onClick={toggleDropdown} className="inline-flex justify-center items-center hover:cursor-pointer">
@@ -69,9 +72,9 @@ export default function NavBar() {
 						</div>
 					) : (
 					<>
-						<a href="login" className="hover:text-sky-500">Log In</a>
+						<button onClick={() => navigate("/login")} className="hover:text-sky-500 hover:cursor-pointer">Log In</button>
 						<div className="bg-sky-700 px-4 py-1 hover:bg-sky-500 hover:cursor-pointer rounded-2xl transition-colors">
-							<a href="register">Register</a>
+							<button onClick={() => navigate("/register")} className="hover:cursor-pointer">Register</button>
 						</div>
 						</>
 					)}

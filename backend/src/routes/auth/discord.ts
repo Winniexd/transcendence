@@ -4,8 +4,11 @@ import { FastifyInstance, FastifyRequest } from "fastify";
 import { insertData, queryUser } from '../../database';
 import path from 'path'
 import fs from 'fs'
+
 interface DiscordCallbackQuery {
-	code?: string;
+	Querystring: {
+		code?: string;
+	}
 }
 
 export default async function discord(app: FastifyInstance) {
@@ -13,7 +16,7 @@ export default async function discord(app: FastifyInstance) {
 		res.redirect('https://discord.com/oauth2/authorize?client_id=1398989102468042923&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fapi%2Fauth%2Fdiscord%2Fredirect&scope=identify')
 	})
 
-	app.get('/api/auth/discord/redirect', async (req: FastifyRequest<{ Querystring: DiscordCallbackQuery }>, res) => {
+	app.get<DiscordCallbackQuery>('/api/auth/discord/redirect', async (req, res) => {
 		const { code } = req.query;
 		if (!code) throw new Error("No code provided in discord Oauth2 request.");
 		const formData = new URLSearchParams({
