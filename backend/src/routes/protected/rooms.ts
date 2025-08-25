@@ -1,4 +1,3 @@
-import { error } from "console";
 import { FastifyInstance } from "fastify";
 import { v4 } from "uuid";
 
@@ -44,6 +43,14 @@ const createRoom = (): Room => {
 
 export default function RoomRoutes(app: FastifyInstance) {
 	const rooms: Record<string, Room> = {};
+	app.get("/rooms", { onRequest: [app.authenticate] }, async (req, res) => {
+		const roomList = Object.entries(rooms).map(([id, room]) => ({
+			id,
+			players: room.players,
+		}));
+		res.send(roomList);
+	})
+
 
 	app.post("/createRoom", { onRequest: [app.authenticate] }, async (req, res) => {
 		if (Object.values(rooms).some(room => room.hasPlayer(req.user.uuid))) {
@@ -59,23 +66,28 @@ export default function RoomRoutes(app: FastifyInstance) {
 	app.post<RoomRequest>("/joinRoom", { onRequest: [app.authenticate] }, async (req, res) => {
 		const { roomId } = req.body;
 
-		if (!rooms[roomId]) return res.status(403).send({ error: "Room doesn't exist"});
+		console.log(`${roomId}, ${req.body.roomId}`);
+		if (!rooms[roomId]) {
+			return res.status(403).send({ error: "Room doesn't exist"});
+		}
 
 		if (Object.values(rooms).some(room => room.hasPlayer(req.user.uuid))) {
 			return res.status(403).send({ error: "You are already in a room" });
 		}
 		
 		if (rooms[roomId].isFull()) return res.status(403).send({ error: "Room is full" });
-
-		if (!rooms[roomId].hasPlayer(req.user.uuid)) rooms[roomId].addPlayer({ id: req.user.uuid, score: 0 });
+		rooms[roomId].addPlayer({ id: req.user.uuid, score: 0 });
 
 		console.log(`${req.user.uuid} joined room ${roomId}`);
 	})
 
 	app.post<RoomRequest>("/leaveRoom", { onRequest: [app.authenticate] }, async (req, res) => {
-		const { roomId } = req.body;
+		const { roomId } = req.body
 
-		if (!rooms[roomId]) return;
+		if (!rooms[roomId]) {
+			console.log(`no roomid provided ${roomId}, ${req.body}`)
+			return;
+		}
 		const idx = rooms[roomId].players.findIndex(p => p.id === req.user.uuid);
 		if (idx !== -1) {
 			console.log(`Removed player ${rooms[roomId].getPlayer(req.user.uuid)}`);
