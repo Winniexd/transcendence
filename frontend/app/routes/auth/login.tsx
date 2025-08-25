@@ -1,6 +1,11 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { useNavigate } from "react-router";
+import { useAuth } from "~/context/authCtx";
 
 const Login = () => {
+	const { logIn } = useAuth();
+	const navigate = useNavigate();
+
 	const [form, setForm] = useState({
 		first_name: "",
 		last_name: "",
@@ -9,19 +14,14 @@ const Login = () => {
 	});
 
 	const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		setForm({ ...form, [event.target.name]: event.target.value})
+		setForm({ ...form, [event.target.name]: event.target.value});
 	}
 
 	const submitForm = async (event: React.FormEvent) => {
 		event.preventDefault();
-		const res = await fetch("http://localhost:3000/login", {
-			method: "POST",
-			headers: { "Content-Type": "application/json"},
-			body: JSON.stringify(form),
-			credentials: "include"
-		})
-		const data = await res.json();
-		console.log(data)
+		const success = await logIn(form);
+		if (success)
+			navigate("/");
 	}
 
 	return (
@@ -43,7 +43,7 @@ const Login = () => {
 			</div>
 			<div className="flex items-center justify-center mt-4">
 				<a href="http://localhost:3000/api/auth/discord/login">
-					<img src='app/assets/discord.jpeg' className="h-10 rounded-full hover:opacity-80 transition-opacity"></img>
+					<img src='/assets/discord.jpeg' className="h-10 rounded-full hover:opacity-80 transition-opacity"></img>
 				</a>
 			</div>
 	</div>

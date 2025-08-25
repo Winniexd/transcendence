@@ -1,44 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
+import { useAuth } from "~/context/authCtx";
 
 export default function NavBar() {
-	const [loggedIn, setLoggedIn] = useState(false);
-	const [avatar, setAvatar] = useState('app/assets/pfp.png');
-	useEffect(() => {
-		const checkAuth = async () => {
-			const authRes = await fetch("http://localhost:3000/me", {
-				method: "GET",
-				credentials: "include"
-			})
-			setLoggedIn(authRes.ok);
-			console.log(authRes);
-			if (authRes.ok) {
-				const avatarRes = await fetch("http://localhost:3000/avatar", {
-					method: "GET",
-					credentials: "include"
-				});
-
-				console.log(avatarRes)
-				if (avatarRes.ok) {
-					const blob = await avatarRes.blob();
-					const url = URL.createObjectURL(blob);
-					setAvatar(url);
-					console.log(url);
-				}
-			}
-		}
-		checkAuth();
-	}, []);
-
-	const logOut = async () => {
-		const res = await fetch("http://localhost:3000/logout", {
-			method: "POST",
-			credentials: "include"
-		})
-
-		localStorage.setItem("loggedIn", "false");
-		setLoggedIn(false);
-	}
+	const { loggedIn, logOut } = useAuth();
+	//const user = useUser();
 
 	const toggleDropdown = () => {
 		const menu = document.getElementById('dropdownMenu');
@@ -59,7 +25,7 @@ export default function NavBar() {
 					{loggedIn ? (
 						<div className="relative inline-block text-left leading-0">
 							<button onClick={toggleDropdown} className="inline-flex justify-center items-center hover:cursor-pointer">
-								<img src={avatar} className="size-12 rounded-full" />
+								<img src={"/assets/pfp.png"} className="size-12 rounded-full" />
 								<svg className="w-5 h-5 ml-2 -mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
 								</svg>

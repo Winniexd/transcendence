@@ -24,6 +24,7 @@ export const links: Route.LinksFunction = () => [
 ];
 
 import NavBar from "./components/navbar";
+import { AuthProvider } from "./context/authCtx";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -36,10 +37,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </head>
       <body className="h-screen">
         <div className="flex flex-col h-full">
-          <NavBar />
+          <AuthProvider>
+            <NavBar />
+
           <main className="flex-grow">
             {children}
           </main>
+          </AuthProvider>
         </div>
         <ScrollRestoration />
         <Scripts />

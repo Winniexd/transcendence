@@ -8,18 +8,17 @@ const Game = () => {
 
 	useEffect(() => {
 		const leaveRoom = () => {
-			const url = "http://localhost:3000/leaveRoom";
-
-			const data = JSON.stringify(roomId);
-			navigator.sendBeacon(url, data);
+			const blob = new Blob([JSON.stringify({ roomId })], {
+  				type: "application/json",
+			});	
+			navigator.sendBeacon("http://localhost:3000/leaveRoom", blob)
 		}
-		window.addEventListener('unload', leaveRoom);
-
+		
+		window.addEventListener('beforeunload', leaveRoom);
 		return () => {
-			leaveRoom();
-			window.removeEventListener('unload', leaveRoom);
+			window.removeEventListener('beforeunload', leaveRoom);
 		}
-	}, [roomId])
+	}, [roomId, location])
 
 	useEffect(() => {
 		const keyDownHandler = (e: KeyboardEvent) => {
@@ -46,11 +45,14 @@ const Game = () => {
 	}, []);
 
 	return (
-		<div className="flex h-full border-4 items-center justify-between px-4">
-			<div id="leftPaddle" className="bg-white h-1/4 w-2" style={{ transform: `translateY(${leftPaddleY}px)` }}></div>
-			<div id="ball" className="bg-white h-4 w-4 m-auto"></div>
-			<div id="rightPaddle" className="bg-white h-1/4 w-2" style={{ transform: `translateY(${rightPaddleY}px)` }}></div>
-		</div>
+		<>
+			
+			<div className="flex h-full border-4 items-center justify-between px-4">
+				<div id="leftPaddle" className="bg-white h-1/4 w-2" style={{ transform: `translateY(${leftPaddleY}px)` }}></div>
+				<div id="ball" className="bg-white h-4 w-4 m-auto"></div>
+				<div id="rightPaddle" className="bg-white h-1/4 w-2" style={{ transform: `translateY(${rightPaddleY}px)` }}></div>
+			</div>
+		</>
 	)
 }
 
