@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { useAuth } from "~/context/authCtx";
+import DarkModeToggle from "./darkModeToggle";
 
 export default function NavBar() {
 	const { loggedIn, logOut } = useAuth();
@@ -14,14 +14,15 @@ export default function NavBar() {
 	const navigate = useNavigate();
 
 	return (
-		<nav className="bg-white border-gray-200 dark:bg-gray-900 dark:border-gray-700 p-4">
+		<nav className="m-4 p-4 border border-text w-3/4 mx-auto rounded-md shadow-md bg-bg-middle">
 			<div className="mx-5 flex items-center justify-between">
 				<button onClick={() => navigate("/")} className="inline-flex gap-2 hover:cursor-pointer">
 					<img src="https://upload.wikimedia.org/wikipedia/commons/a/a7/React-icon.svg" alt="Logo" className="h-7"></img>
 					<p className="text-2xl font-semibold text-gray-900 dark:text-white">Transcendance</p>
 				</button>
-				<div className="flex items-center gap-6 text-gray-700 dark:text-gray-300">
-					<button onClick={() => navigate("/play")} className="hover:text-sky-500 hover:cursor-pointer">Play</button>
+				<div className="flex items-center gap-6 text-[var(--text)]">
+					<DarkModeToggle></DarkModeToggle>
+					<button onClick={() => navigate("/play")} className="hover:text-primary hover:cursor-pointer">Play</button>
 					{loggedIn ? (
 						<div className="relative inline-block text-left leading-0">
 							<button onClick={toggleDropdown} className="inline-flex justify-center items-center hover:cursor-pointer">
@@ -38,9 +39,9 @@ export default function NavBar() {
 						</div>
 					) : (
 					<>
-						<button onClick={() => navigate("/login")} className="hover:text-sky-500 hover:cursor-pointer">Log In</button>
-						<div className="bg-sky-700 px-4 py-1 hover:bg-sky-500 hover:cursor-pointer rounded-2xl transition-colors">
-							<button onClick={() => navigate("/register")} className="hover:cursor-pointer">Register</button>
+						<button onClick={() => navigate("/login")} className="hover:text-primary hover:cursor-pointer">Log In</button>
+						<div className="bg-primary px-4 py-1 hover:opacity-80 hover:cursor-pointer rounded-md transition-opacity duration-200">
+							<button onClick={() => navigate("/register")} className="hover:cursor-pointer text-white">Register</button>
 						</div>
 						</>
 					)}
